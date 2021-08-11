@@ -1,0 +1,17 @@
+@use "colors";
+
+// Colors
+$bg-color: colors.$bg-gray;
+$dot-color: darken(colors.$bg-gray, 10);
+
+// Dimensions
+$dot-size: 2px;
+$dot-space: 64px;
+
+body {
+  background:
+          linear-gradient(90deg, $bg-color ($dot-space - $dot-size), transparent 1%) center,
+          linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) center,
+          $dot-color;
+  background-size: $dot-space $dot-space;
+}
