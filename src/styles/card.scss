@@ -1,0 +1,14 @@
+.movie-detail {
+  &__container {
+    min-height: 50vh;
+    height: 100%;
+  }
+
+  &__image-container {
+    flex-basis: 33.3%;
+  }
+
+  &__content {
+    flex-basis: 66.6%;
+  }
+}

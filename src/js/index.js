@@ -1,80 +1,110 @@
-let movies = [];
-let searchingMovie= '';
-const resultContainer = document.querySelector('.result__container');
-const searchInput = document.querySelector('.search__input');
-const searchButton = document.querySelector('.search__button');
+const data = {
+    movies: [],
+};
 
-searchButton.addEventListener('click', () => {
-    searchingMovie = searchInput.value;
+const ui = {
+    resultContainer: document.querySelector('.result__container'),
+    searchInput: document.querySelector('.search__input'),
+    searchButton: document.querySelector('.search__button'),
+}
 
-    fetchMovie(searchingMovie);
-});
-
-searchInput.addEventListener('input', function (evt) {
+ui.searchInput.addEventListener('input', function (evt) {
     if (this.value === '') {
-        resultContainer.innerHTML =
-            `<img class="flex-basis-100 h-36" src="./assets/no-result.svg" alt="Search a movie"/>
-             <h1 class="flex-basis-100 text-3xl text-center font-medium text-gray-500">Search a movie</h1>
-            `;
+        renderSearchMovieContainer();
     }
 });
 
-searchInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        searchingMovie = searchInput.value;
+ui.searchButton.addEventListener('click', () => {
+    fetchMovies();
+});
 
-        fetchMovie(searchingMovie);
+ui.searchInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter'){
+        fetchMovies();
     }
 });
 
-function fetchMovie(movieName) {
-    fetch(`https://www.omdbapi.com/?s=${movieName}&apikey=thewdb`)
-        .then(response => response.json())
-        .then((response) => {
-            if (response.Response) {
-                movies = response.Search;
-                resultContainer.innerHTML = '';
+const renderSearchMovieContainer = () => {
+    ui.resultContainer.innerHTML = `
+    <img class="flex-basis-100 h-36" src="./assets/no-result.svg" alt="Search a movie"/>
+    <h1 class="flex-basis-100 text-3xl text-center font-medium text-gray-500">Search a movie</h1>
+  `;
+}
 
-                movies.forEach((movies) => {
-                    resultContainer.innerHTML +=
-                        `<div class="result__card transform transition duration-500 hover:scale-110 m-4 flex-shrink w-64">
-                              <a href="/deneme" imdb-id="${movies.imdbID}" target="_blank">
-                                  <div style="height: 420px;">
-                                      <img class="w-full h-full object-cover object-center rounded-lg shadow-md"
-                                           src="${movies.Poster}"
-                                           alt="${movies.Title}"
-                                      >
-                                  </div>
-                              </a>
+function fetchMovies() {
+    const searchText = ui.searchInput.value;
 
-                          <div class="relative px-4 -mt-16">
-                              <div class="bg-white p-6 rounded-lg shadow-lg">
-                                <div class="flex items-baseline">
-                                  <div class="bg-red-500 text-white text-xs px-2 inline-block rounded-full uppercase">
-                                    ${movies.Type}
-                                  </div>
-                    
-                                  <div class="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
-                                    ${movies.Year}
-                                  </div>
-                                </div>
-                    
-                                <a href="www.google.com" target="_blank"  imdb-id="${movies.imdbID}">
-                                  <h4
-                                    class="transition duration-500 hover:text-red-500 mt-2 text-xl font-semibold uppercase leading-tight truncate">
-                                    ${movies.Title}
-                                  </h4>
-                                </a>
-                              </div>
-                          </div>
-                         </div>`;
-                });
-            }
-        })
-        .catch(() => {
-            resultContainer.innerHTML =
-                `<img class="flex-basis-100 h-36" src="./assets/no-result.svg" alt="Movie not found"/>
-                 <h1 class="flex-basis-100 text-3xl text-center font-medium text-gray-500">Movie not found</h1>
-                 `;
-        });
+    fetch(`https://www.omdbapi.com/?s=${searchText}&apikey=thewdb`)
+      .then(response => response.json())
+      .then((response) => {
+          if (response.Response) {
+              data.movies = response.Search;
+
+              cleanResultContainer()
+
+              renderMovies()
+          }
+      }).catch(() => {
+        renderErrorMessage();
+    });
+}
+
+const cleanResultContainer = () => {
+    ui.resultContainer.innerHTML = '';
+}
+
+const renderMovies = () => {
+    ui.resultContainer.innerHTML = data.movies.reduce((acc, movie) => {
+        return acc + `
+      <div class="result__card transform transition duration-500 hover:scale-110 m-4 flex-shrink w-64">
+        ${renderMovieCardHeader(movie)}
+
+        <div class="relative px-4 -mt-16">
+          ${renderMovieCardContent(movie)}
+        </div>
+      </div>`;
+    }, '');
+}
+
+const renderMovieCardHeader = (movie) => {
+    return `
+    <a href="/movie-detail.html?imdbId=${movie.imdbID}" target="_blank">
+      <div style="height: 420px;">
+        <img class="w-full h-full object-cover object-center rounded-lg shadow-md"
+           src="${movie.Poster}"
+           alt="${movie.Title}"
+        >
+      </div>
+    </a>
+  `
+}
+
+const renderMovieCardContent = (movie) => {
+    return `
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+      <div class="flex items-baseline">
+        <div class="bg-red-500 text-white text-xs px-2 inline-block rounded-full uppercase">
+          ${movie.Type}
+        </div>
+  
+        <div class="ml-2 text-gray-600 uppercase text-xs font-semibold tracking-wider">
+          ${movie.Year}
+        </div>
+      </div>
+  
+      <a href="/movie-detail.html?imdbId=${movie.imdbID}" target="_blank">
+        <h4
+          class="transition duration-500 hover:text-red-500 mt-2 text-xl font-semibold uppercase leading-tight truncate">
+          ${movie.Title}
+        </h4>
+      </a>
+    </div>
+  `
+}
+
+const renderErrorMessage = () => {
+    ui.resultContainer.innerHTML = `
+    <img class="flex-basis-100 h-36" src="./assets/no-result.svg" alt="Movie not found"/>
+    <h1 class="flex-basis-100 text-3xl text-center font-medium text-gray-500">Movie not found</h1>
+  `;
 }
