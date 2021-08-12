@@ -68,7 +68,7 @@ const renderMovies = () => {
 
 const renderMovieCardHeader = (movie) => {
     return `
-    <a href="/movie-detail.html?imdbId=${movie.imdbID}" target="_blank">
+    <a href="./movie-detail.html?imdbId=${movie.imdbID}" target="_blank">
       <div style="height: 420px;">
         <img class="w-full h-full object-cover object-center rounded-lg shadow-md"
            src="${movie.Poster}"
@@ -92,7 +92,7 @@ const renderMovieCardContent = (movie) => {
         </div>
       </div>
   
-      <a href="/movie-detail.html?imdbId=${movie.imdbID}" target="_blank">
+      <a href="./movie-detail.html?imdbId=${movie.imdbID}" target="_blank">
         <h4
           class="transition duration-500 hover:text-red-500 mt-2 text-xl font-semibold uppercase leading-tight truncate">
           ${movie.Title}
